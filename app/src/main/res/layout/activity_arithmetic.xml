@@ -253,7 +253,7 @@
             android:text="correct"
             android:textSize="50dp"
             android:layout_gravity="center"
-            android:gravity="center"
+            android:gravity="center|right"
             android:textColor="#2a18ff" />
 
         <TextView
@@ -262,13 +262,16 @@
             android:text="uuuu"
             android:id="@+id/status_textView"
             android:textSize="20dp"
-            android:textIsSelectable="true" />
+            android:textIsSelectable="true"
+            android:textAlignment="textEnd"
+            android:gravity="right" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="score 100"
             android:id="@+id/score_textView"
-            android:textSize="20dp" />
+            android:textSize="20dp"
+            android:gravity="right" />
     </LinearLayout>
 </RelativeLayout>

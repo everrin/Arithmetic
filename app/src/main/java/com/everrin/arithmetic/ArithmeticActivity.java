@@ -1,8 +1,7 @@
 package com.everrin.arithmetic;
 
-import android.content.res.Resources;
+import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -18,8 +17,9 @@ import java.util.Random;
 
 public class ArithmeticActivity extends AppCompatActivity {
 
-    private int a = 0;
-    private int b = 0;
+    //private int a = 0;
+    //private int b = 0;
+    SimpleFormula mFormula = new SimpleFormula(SimpleFormula.OPERATOR.ADD);
     private int mCorrectCount = 0;
     private int mIncorrectCount = 0;
 
@@ -28,7 +28,11 @@ public class ArithmeticActivity extends AppCompatActivity {
     private TextView mStatusTextView;
     private TextView mScoreTextView;
 
-    private int mSelectedMenu = R.id.action_random;
+    final public static int RANDOM_NUMBER = 10;
+    private int mSelectedMenu = RANDOM_NUMBER;
+
+    private int mOperatorIndex = 0;
+    private SimpleFormula.OPERATOR[] mOp = {SimpleFormula.OPERATOR.ADD, SimpleFormula.OPERATOR.SUB, SimpleFormula.OPERATOR.RANDOM};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +45,10 @@ public class ArithmeticActivity extends AppCompatActivity {
         mResultTextView = (TextView)findViewById(R.id.result_view);
         mStatusTextView = (TextView)findViewById(R.id.status_textView);
         mScoreTextView  = (TextView)findViewById(R.id.score_textView);
-
-        generateNewItem();
-        displayOverallStatus();
         mResultTextView.setTextColor(Color.BLUE);
+        getWindow().setBackgroundDrawableResource(R.drawable.hmbb_bob);
 
-        //getWindow().setBackgroundDrawableResource(R.drawable.hmbb);
-        //getWindow().setBackgroundDrawableResource(R.drawable.pdx);
-        getWindow().setBackgroundDrawableResource(R.drawable.building);
+        reset();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ArithmeticActivity extends AppCompatActivity {
         {
             mBtns[i] = (Button)this.findViewById(mButtonIDs[i]);
             mBtns[i].setTextSize(25);
-            mBtns[i].setTextColor(Color.WHITE);
+            mBtns[i].setTextColor(Color.rgb(0x0b2, 0x3a, 0x0ee));
             mBtns[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -83,7 +83,8 @@ public class ArithmeticActivity extends AppCompatActivity {
                         s = s.substring(1);
                     }
                    int c = Integer.parseInt(s);
-                    checkResult(a, b, c);
+                    mFormula.setInputResult(c);
+                    checkResult();
                    generateNewItem();
                 }
             });
@@ -103,7 +104,7 @@ public class ArithmeticActivity extends AppCompatActivity {
         String s = correctString + correctCountString + WrongString + wrongCountString;
         SpannableString sp = new SpannableString(s);
 
-        sp.setSpan(new ForegroundColorSpan(Color.GREEN), start1, start1 + correctCountString.length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sp.setSpan(new ForegroundColorSpan(Color.WHITE), start1, start1 + correctCountString.length() + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sp.setSpan(new ForegroundColorSpan(Color.RED), start2, start2 + wrongCountString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         mStatusTextView.setText(sp);
@@ -114,9 +115,9 @@ public class ArithmeticActivity extends AppCompatActivity {
         mScoreTextView.setText("Score : " + score);
     }
 
-    private void checkResult(int _a, int _b, int _c)
+    private void checkResult()
     {
-        boolean r = ((_a + _b) == _c ) ? true: false;
+        boolean r = mFormula.checkResult();
 
         if(r) {
             mResultTextView.setText("correct");
@@ -130,38 +131,14 @@ public class ArithmeticActivity extends AppCompatActivity {
         displayOverallStatus();
     }
 
-    final private int[] mMenus = {R.id.action_random,
-             R.id.action_1,
-             R.id.action_2,
-             R.id.action_3,
-             R.id.action_4,
-             R.id.action_5,
-             R.id.action_6,
-             R.id.action_7,
-             R.id.action_8,
-             R.id.action_9
-};
-
-    private int getNumberFromMenu(int menuID)
-    {
-        for(int i = 0; i < mMenus.length; i++)
-        {
-            if(mMenus[i] == menuID)
-                return i;
-        }
-
-        return 0;
-    }
-
-    private int getMenuIdFromNumber(int i)
-    {
-        return mMenus[i];
-    }
-
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(mSelectedMenu).setChecked(true);
-        return super.onPrepareOptionsMenu(menu);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK)
+        {
+            int num = data.getIntExtra(NumberSelectActivity.NUMBER_NAME, 1);
+            mSelectedMenu = num;
+        }
+        generateNewItem();
     }
 
     @Override
@@ -174,20 +151,24 @@ public class ArithmeticActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
        switch(id)
        {
-           case R.id.action_random:
-           case R.id.action_1:
-           case R.id.action_2:
-           case R.id.action_3:
-           case R.id.action_4:
-           case R.id.action_5:
-           case R.id.action_6:
-           case R.id.action_7:
-           case R.id.action_8:
-           case R.id.action_9:
-                mSelectedMenu = id;
+           case R.id.action_choose_op:
+               mOperatorIndex++;
+               if(mOperatorIndex == mOp.length)
+                   mOperatorIndex = 0;
+               mFormula.setOperator(mOp[mOperatorIndex]);
+               item.setTitle(mOp[mOperatorIndex].toString());
                generateNewItem();
                break;
-
+           case R.id.action_show_add_table:
+               Intent i = new Intent(this, AddTableActivity.class);
+               this.startActivity(i);
+               break;
+           case R.id.action_pick_num:
+               Intent x = new Intent(this, NumberSelectActivity.class);
+               x.putExtra(NumberSelectActivity.INIT_VALUE_NAME, mSelectedMenu);
+               x.putExtra(NumberSelectActivity.DISPLAY_STYLE_NAME, NumberSelectActivity.STYLE_WITH_RANDOM);
+               startActivityForResult(x, 0);
+               break;
            case R.id.action_reset:
                reset();
                break;
@@ -200,8 +181,7 @@ public class ArithmeticActivity extends AppCompatActivity {
 
     private void reset()
     {
-        a = 0;
-        b = 0;
+        mFormula.setOperator(mOp[mOperatorIndex]);
         mCorrectCount = 0;
         mIncorrectCount = 0;
 
@@ -212,15 +192,18 @@ public class ArithmeticActivity extends AppCompatActivity {
 
     private void generateNewItem()
     {
-        Random r = new Random();
-        if(mSelectedMenu == R.id.action_random)
+        if(mOp[mOperatorIndex] == SimpleFormula.OPERATOR.RANDOM)
         {
-            a = r.nextInt(9) + 1;
-        }else {
-            a = getNumberFromMenu(mSelectedMenu);
+            Random r = new Random();            ;
+            mFormula.setOperator(mOp[r.nextInt(2)]);
         }
-        b = r.nextInt(9) + 1;
+        if(mSelectedMenu == RANDOM_NUMBER)
+        {
+            mFormula.generateNewItem(false, 0);
+        }else {
+            mFormula.generateNewItem(true, mSelectedMenu);
+        }
 
-        mdisplayTextView.setText(String.format("%d + %d = ?", a, b));
+        mdisplayTextView.setText(mFormula.toString());
     }
 }

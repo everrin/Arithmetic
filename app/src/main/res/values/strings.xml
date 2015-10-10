@@ -14,4 +14,10 @@
     <string name="menu_8">8</string>
     <string name="menu_9">9</string>
     <string name="menu_reset">reset</string>
+    <string name="menu_op">+</string>
+    <string name="menu_next_tbl">next table</string>
+    <string name="menu_show_add_table">Add table</string>
+    <string name="menu_show_num_picker">picker</string>
+    <string name="title_activity_add_table">AddTableActivity</string>
+    <string name="title_activity_number_select">NumberSelectActivity</string>
 </resources>

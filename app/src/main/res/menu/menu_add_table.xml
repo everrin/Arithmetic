@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.everrin.arithmetic.AddTableActivity">
+
+    <item android:id="@+id/action_table_next" android:title="@string/menu_next_tbl"
+        android:orderInCategory="100" app:showAsAction="always" />
+
+    <item android:id="@+id/action_show_selector" android:title="@string/menu_show_num_picker"
+        android:orderInCategory="100" app:showAsAction="always" />
+</menu>
