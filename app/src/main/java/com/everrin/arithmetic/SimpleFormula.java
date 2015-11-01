@@ -38,7 +38,7 @@ public class SimpleFormula {
 
             return "&";
         }
-    };
+    }
 
     public OPERATOR getRandomOperator(OPERATOR[] ops)
     {
@@ -74,6 +74,12 @@ public class SimpleFormula {
     public String toString()
     {
         return String.format("%d %s %d = ?", mA, mOP.toString(), mB);
+    }
+
+    // display the input result. correct or incorrect
+    public String toInputString()
+    {
+        return String.format("%d %s %d = %d", mA, mOP.toString(), mB, mC);
     }
 
     public int getResult()
@@ -136,6 +142,7 @@ public class SimpleFormula {
     public SimpleFormula CloneFormula()
     {
         SimpleFormula f = new SimpleFormula(this.mA, this.mB, this.mOP);
+        f.mC = mC;
         return f;
     }
 

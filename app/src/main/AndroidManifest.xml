@@ -21,9 +21,13 @@
             android:label="@string/title_activity_add_table" >
         </activity>
         <activity
-            android:theme="@style/Theme.AppCompat.Dialog.Alert"
             android:name=".NumberSelectActivity"
-            android:label="@string/title_activity_number_select" >
+            android:label="@string/title_activity_number_select"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert" >
+        </activity>
+        <activity
+            android:name=".HistoryDisplayActivity"
+            android:label="@string/title_activity_history_display" >
         </activity>
     </application>
 

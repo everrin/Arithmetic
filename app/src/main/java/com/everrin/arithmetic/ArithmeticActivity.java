@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class ArithmeticActivity extends AppCompatActivity {
@@ -34,6 +35,8 @@ public class ArithmeticActivity extends AppCompatActivity {
     private int mOperatorIndex = 0;
     private SimpleFormula.OPERATOR[] mOp = {SimpleFormula.OPERATOR.ADD, SimpleFormula.OPERATOR.SUB, SimpleFormula.OPERATOR.RANDOM};
 
+    public static ArrayList<SimpleFormula> mWronglist = new ArrayList<SimpleFormula>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,12 @@ public class ArithmeticActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawableResource(R.drawable.hmbb_bob);
 
         reset();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_review_incorrect).setVisible(mWronglist.size()!= 0);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -128,6 +137,9 @@ public class ArithmeticActivity extends AppCompatActivity {
             mResultTextView.setTextColor(Color.RED);
             mIncorrectCount++;
         }
+
+        mWronglist.add(mFormula.CloneFormula());
+
         displayOverallStatus();
     }
 
@@ -135,8 +147,7 @@ public class ArithmeticActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK)
         {
-            int num = data.getIntExtra(NumberSelectActivity.NUMBER_NAME, 1);
-            mSelectedMenu = num;
+            mSelectedMenu = data.getIntExtra(NumberSelectActivity.NUMBER_NAME, 1);
         }
         generateNewItem();
     }
@@ -169,6 +180,9 @@ public class ArithmeticActivity extends AppCompatActivity {
                x.putExtra(NumberSelectActivity.DISPLAY_STYLE_NAME, NumberSelectActivity.STYLE_WITH_RANDOM);
                startActivityForResult(x, 0);
                break;
+           case R.id.action_review_incorrect:
+               reviewIncorrectItems();
+               break;
            case R.id.action_reset:
                reset();
                break;
@@ -177,6 +191,12 @@ public class ArithmeticActivity extends AppCompatActivity {
        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reviewIncorrectItems()
+    {
+        Intent i = new Intent(this, HistoryDisplayActivity.class);
+        startActivity(i);
     }
 
     private void reset()
@@ -188,13 +208,15 @@ public class ArithmeticActivity extends AppCompatActivity {
         generateNewItem();
         displayOverallStatus();
         mResultTextView.setText("");
+
+        mWronglist.clear();
     }
 
     private void generateNewItem()
     {
         if(mOp[mOperatorIndex] == SimpleFormula.OPERATOR.RANDOM)
         {
-            Random r = new Random();            ;
+            Random r = new Random();
             mFormula.setOperator(mOp[r.nextInt(2)]);
         }
         if(mSelectedMenu == RANDOM_NUMBER)
